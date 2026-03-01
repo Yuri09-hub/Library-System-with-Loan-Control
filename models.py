@@ -1,7 +1,9 @@
 from sqlalchemy import Column, ForeignKey, Float, DateTime, Integer, String, create_engine, JSON, Boolean
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import declarative_base, sessionmaker
 
 db = create_engine('sqlite:///data.db')
+Session = sessionmaker(bind=db)
+session = Session()
 
 base = declarative_base()
 
