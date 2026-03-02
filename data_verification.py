@@ -4,7 +4,6 @@ import re
 def email_validation(email):
     gmail = re.compile(r".@gmail.com")
     if not gmail.findall(email):
-        print("email is not valid")
         return False
     return True
 
@@ -12,37 +11,25 @@ def email_validation(email):
 def number_validation(phone):
     numbers = re.compile(r"/D")
     if numbers.findall(phone):
-        print("Phone number is valid")
         return False
     return True
 
 
-def isbn_validation(isbn):
+def is_valid_isbn13(isbn):
+    # Remove hyphens and spaces
+    clean_isbn = re.sub(r'[-\s]', '', isbn)
 
-    # 1. Clears the string (removes dashes and spaces)
-    isbn = re.sub(r'[-\s]', '', isbn).upper()
+    # Must be exactly 13 digits
+    if not (len(clean_isbn) == 13 and clean_isbn.isdigit()):
+        return False
 
-    # 2. ISBN-10 Validation
-    if len(isbn) == 10:
-        if not re.match(r'^\d{9}[\dX]$', isbn):
-            return False
-        count = 0
-        for i in range(10):
-            val = 10 if isbn[i] == 'X' else int(isbn[i])
-            count += val * (10 - i)
-        return count % 11 == 0
+    # Calculate checksum
+    # Weight: 1 for even index, 3 for odd index
+    total = 0
+    for i, digit in enumerate(clean_isbn):
+        multiplier = 1 if i % 2 == 0 else 3
+        total += int(digit) * multiplier
 
-    # 3. Validação ISBN-13
-    elif len(isbn) == 13:
-        if not isbn.isdigit():
-            return False
-
-        count = 0
-        for i, digito in enumerate(isbn):
-            # Alternating weights: 1 for even indices, 3 for odd indices.
-            weights = 1 if i % 2 == 0 else 3
-            count += int(digito) * weights
-        return count % 10 == 0
-
-    return False
+    # Valid if the total is divisible by 10
+    return total % 10 == 0
 
