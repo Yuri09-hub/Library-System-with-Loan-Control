@@ -14,7 +14,7 @@ class Book(base):
     name = Column("name", String, nullable=False)
     writer = Column("writer", String, nullable=False)
     Category = Column("Category", String, nullable=False)
-    isbn = Column("isbn", String, nullable=False)
+    isbn = Column("isbn", String, nullable=False, unique=True)
     stock = Column("stock", Integer, nullable=False)
 
     def __init__(self, name, writer, Category, isbn, stock):
@@ -30,10 +30,10 @@ class User(base):
 
     id = Column("id", Integer, primary_key=True, autoincrement=True)
     name = Column("Name", String)
-    email = Column("email", String, nullable=False)
+    email = Column("email", String, nullable=False, unique=True)
     password = Column("password", String, nullable=False)
     phone = Column("phone", String, nullable=False)
-    id_card = Column("id_card", String, nullable=False)
+    id_card = Column("id_card", String, nullable=False, unique=True)
     loan_history = Column("loan_history", JSON, default=[])
 
     def __init__(self, name, email, password, phone, id_card):
