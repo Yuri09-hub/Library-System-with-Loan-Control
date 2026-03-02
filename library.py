@@ -19,7 +19,7 @@ class Library:
                 session.close()
                 return "Book added successfully"
         except IntegrityError as e:
-            return f" Error: {e}"
+            return f" fun.register_book Error: {e}"
 
     @staticmethod
     def register_user(name: str, email: str, phone: str, id_card: str):
@@ -35,7 +35,7 @@ class Library:
                 session.close()
                 return "User created successfully"
         except IntegrityError as e:
-            return f" Error: {e}"
+            return f" fun.register_user Error: {e}"
 
     @staticmethod
     def register_loan(book, user, expected_day):
@@ -55,7 +55,7 @@ class Library:
             elif count >= 3:
                 return "Too many loans"
 
-            loan_date = datetime.now(timezone.utc)
+            loan_date = datetime.now()
             expected_deadline = timedelta(days=expected_day)
             actual_deadline = timedelta(days=expected_day + 2)
 
@@ -68,7 +68,7 @@ class Library:
             session.close()
             return "Loan added successfully"
         except IntegrityError as e:
-            return f" Error: {e}"
+            return f" fun.register_loan Error: {e}"
 
     @staticmethod
     def return_book(user, id_book):
@@ -94,7 +94,7 @@ class Library:
                 return f"The book was returned within its business days."
 
         except IntegrityError as e:
-            return f" Error: {e}"
+            return f"fun.return_book Error: {e}"
 
     @staticmethod
     def pay_fines(user):
@@ -109,10 +109,43 @@ class Library:
             session.close()
             return f"You have paidd the fines successfully"
         except IntegrityError as e:
-            return f" Error: {e}"
+            return f" fun.pay_fines Error: {e}"
 
     @staticmethod
-    def 
+    def search_book(name: str, writer: str, Category: str, choice: int):
+        try:
+            if choice == 1:
+                books = session.query(Book).filter(Book.name == name).all()
+                if not books:
+                    print("Book not found")
+                for book in books:
+                    print(
+                        f"{book.id:<5}{book.name:<20}{book.writer:<20}{book.Category:<15}{book.isbn:<20}{book.stock:<10}")
+
+                print("-" * 100)
+
+            elif choice == 2:
+                books = session.query(Book).filter(Book.writer == writer).all()
+                if not books:
+                    print("Book not found")
+                for book in books:
+                    print(
+                        f"{book.id:<5}{book.name:<20}{book.writer:<20}{book.Category:<15}{book.isbn:<20}{book.stock:<10}")
+
+                print("-" * 100)
+
+            elif choice == 3:
+                books = session.query(Book).filter(Book.Category == Category).all()
+                if not books:
+                    print("Book not found")
+                for book in books:
+                    print(
+                        f"{book.id:<5}{book.name:<20}{book.writer:<20}{book.Category:<15}{book.isbn:<20}{book.stock:<10}")
+
+                print("-" * 100)
+
+        except IntegrityError as e:
+            print(f"fun.search_book- Error: {e}")
 
     @staticmethod
     def view_books():
@@ -124,7 +157,7 @@ class Library:
 
             print("-" * 100)
         except IntegrityError as e:
-            print(f"Error: {e}")
+            print(f"fun.view_books- Error: {e}")
 
     @staticmethod
     def view_users():
@@ -140,4 +173,4 @@ class Library:
                       f"{total_loans:<10}")
             print("-" * 120)
         except IntegrityError as e:
-            print(f"Error: {e}")
+            print(f"fun. view_users - Error: {e}")

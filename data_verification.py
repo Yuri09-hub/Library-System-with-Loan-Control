@@ -8,9 +8,9 @@ def email_validation(email):
     return True
 
 
-def number_validation(phone):
+def number_validation(phone: str):
     numbers = re.compile(r"/D")
-    if numbers.findall(phone):
+    if numbers.findall(phone) or len(phone) != 9:
         return False
     return True
 
@@ -32,4 +32,3 @@ def is_valid_isbn13(isbn):
 
     # Valid if the total is divisible by 10
     return total % 10 == 0
-
