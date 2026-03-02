@@ -7,7 +7,7 @@ from datetime import datetime, timedelta, timezone
 class Library:
 
     @staticmethod
-    def register_book(name:str, writer:str, Category:str, isbn:str, stock:int):
+    def register_book(name: str, writer: str, Category: str, isbn: str, stock: int):
         try:
             if not is_valid_isbn13(isbn):
                 return "ISBN is not valid"
@@ -50,23 +50,69 @@ class Library:
 
             if not verify_book:
                 return "Book not found"
-            elif count >= 3:
-                return "Too many loans"
             elif not verify_user:
                 return "User not found"
+            elif count >= 3:
+                return "Too many loans"
 
             loan_date = datetime.now(timezone.utc)
             expected_deadline = timedelta(days=expected_day)
             actual_deadline = timedelta(days=expected_day + 2)
 
             new_loan = Loan(book=book, user=user, loan_date=loan_date, expected_return_date=expected_deadline,
-                            actual_return_date=actual_deadline,)
+                            actual_return_date=actual_deadline, )
+
             session.add(new_loan)
+            verify_user.loans.append(f"book: {verify_book.name}/ date:{new_loan.loan_date}")
             session.commit()
             session.close()
             return "Loan added successfully"
         except IntegrityError as e:
             return f" Error: {e}"
+
+    @staticmethod
+    def return_book(user, id_book):
+        try:
+            today = datetime.now(timezone.utc)
+            user_found = session.query(Loan).filter(Loan.id == user, Loan.book == id_book).first()
+            if not user_found:
+                return "Loan not found"
+
+            if user_found.loan_date < today:
+                d = today - user_found.loan_date
+                pay = d.days * 2.0
+                fine = Fine(book=id_book, user=user, fine=pay, date=today)
+                user_found.active = False
+                session.add(fine)
+                session.commit()
+                session.close()
+                return f"The book has been returned, due to the delay(s), you will be fined .{pay} "
+            else:
+                user_found.active = False
+                session.commit()
+                session.close()
+                return f"The book was returned within its business days."
+
+        except IntegrityError as e:
+            return f" Error: {e}"
+
+    @staticmethod
+    def pay_fines(user):
+        try:
+            user = session.query(Fine).filter(Fine.user == user).all()
+            if not user:
+                return "User not found"
+
+            for users in user:
+                users.active = False
+            session.commit()
+            session.close()
+            return f"You have paidd the fines successfully"
+        except IntegrityError as e:
+            return f" Error: {e}"
+
+    @staticmethod
+    def 
 
     @staticmethod
     def view_books():
@@ -83,9 +129,15 @@ class Library:
     @staticmethod
     def view_users():
         try:
-            user = session.query(User).all()
-            for users in user:
-
-
-
-
+            users = session.query(User).all()
+            for user in users:
+                total_loans = len(user.loan_history)
+                print(f"{user.id:<5}"
+                      f"{user.name:<20}"
+                      f"{user.email:<25}"
+                      f"{user.phone:<15}"
+                      f"{user.id_card:<20}"
+                      f"{total_loans:<10}")
+            print("-" * 120)
+        except IntegrityError as e:
+            print(f"Error: {e}")

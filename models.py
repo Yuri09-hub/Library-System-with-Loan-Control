@@ -35,7 +35,7 @@ class User(base):
     id_card = Column("id_card", String, nullable=False, unique=True)
     loan_history = Column("loan_history", JSON, default=list)
 
-    def __init__(self, name, email,phone, id_card):
+    def __init__(self, name, email, phone, id_card):
         self.name = name
         self.email = email
         self.phone = phone
@@ -54,7 +54,7 @@ class Loan(base):
     actual_return_date = Column("actual_return_date", DateTime)
     active = Column("active", Boolean)
 
-    def __init__(self, book, user, loan_date, expected_return_date, actual_return_date,active=True):
+    def __init__(self, book, user, loan_date, expected_return_date, actual_return_date, active=True):
         self.book = book
         self.user = user
         self.loan_date = loan_date
@@ -73,11 +73,12 @@ class Fine(base):
     fine = Column("fine", Float)
     active = Column("active", Boolean)
 
-    def __init__(self, book, user, date, fine=2.0):
+    def __init__(self, book, user, date, fine=0.0, active=True):
         self.book = book
         self.user = user
         self.date = date
         self.fine = fine
+        self.active = active
 
 
 base.metadata.create_all(bind=db)
