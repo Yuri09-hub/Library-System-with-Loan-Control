@@ -10,7 +10,7 @@ def email_validation(email):
 
 def number_validation(phone: str):
     numbers = re.compile(r"/D")
-    if numbers.findall(phone) or len(phone) != 9:
+    if numbers.findall(phone) and len(phone) != 9:
         return False
     return True
 

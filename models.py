@@ -1,5 +1,6 @@
-from sqlalchemy import Column, ForeignKey, Float, DateTime, Integer, String, create_engine, JSON, Boolean
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy import Column, ForeignKey, Float, DateTime, Integer, String, create_engine, Boolean
+from sqlalchemy.orm import declarative_base, sessionmaker, Relationship
+
 
 db = create_engine('sqlite:///data.db')
 Session = sessionmaker(bind=db)
@@ -33,7 +34,7 @@ class User(base):
     email = Column("email", String, nullable=False, unique=True)
     phone = Column("phone", String, nullable=False)
     id_card = Column("id_card", String, nullable=False, unique=True)
-    loan_history = Column("loan_history", JSON, default=list)
+    loan = Relationship("Loan", back_populates="users")
 
     def __init__(self, name, email, phone, id_card):
         self.name = name
@@ -47,19 +48,21 @@ class Loan(base):
     __tablename__ = 'loans'
 
     id = Column("id", Integer, primary_key=True, autoincrement=True)
-    book = Column("book_id", Integer, ForeignKey('books.id'))
-    user = Column("user", Integer, ForeignKey('users.id'))
+    book_id = Column("book_id", Integer, ForeignKey('books.id'))
+    user_id = Column("user_id", Integer, ForeignKey('users.id'))
     loan_date = Column("loan_date", DateTime)
-    expected_return_date = Column("expected_return_date", DateTime)
-    actual_return_date = Column("actual_return_date", DateTime)
+    grace_deadline = Column("grace_deadline", DateTime)
+    final_deadline = Column("final_deadline", DateTime)
     active = Column("active", Boolean)
 
-    def __init__(self, book, user, loan_date, expected_return_date, actual_return_date, active=True):
+    user = Relationship("User", back_populates="loans")
+
+    def __init__(self, book, user, loan_date, grace_deadline, final_deadline, active=True):
         self.book = book
         self.user = user
         self.loan_date = loan_date
-        self.expected_return_date = expected_return_date
-        self.actual_return_date = actual_return_date
+        self.grace_deadline = grace_deadline
+        self.final_deadline = final_deadline
         self.active = active
 
 
