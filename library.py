@@ -178,3 +178,4 @@ class Library:
                   f"{str(loan.grace_deadline):<20}"
                   f"{str(loan.final_deadline):<20}"
                   f"{str(loan.active):<10}")
+

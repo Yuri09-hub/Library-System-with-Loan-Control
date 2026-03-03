@@ -1,7 +1,6 @@
 from sqlalchemy import Column, ForeignKey, Float, DateTime, Integer, String, create_engine, Boolean
 from sqlalchemy.orm import declarative_base, sessionmaker, Relationship
 
-
 db = create_engine('sqlite:///data.db')
 Session = sessionmaker(bind=db)
 session = Session()
@@ -34,14 +33,12 @@ class User(base):
     email = Column("email", String, nullable=False, unique=True)
     phone = Column("phone", String, nullable=False)
     id_card = Column("id_card", String, nullable=False, unique=True)
-    loan = Relationship("Loan", back_populates="users")
 
     def __init__(self, name, email, phone, id_card):
         self.name = name
         self.email = email
         self.phone = phone
         self.id_card = id_card
-        self.loan_history = []
 
 
 class Loan(base):
@@ -54,8 +51,6 @@ class Loan(base):
     grace_deadline = Column("grace_deadline", DateTime)
     final_deadline = Column("final_deadline", DateTime)
     active = Column("active", Boolean)
-
-    user = Relationship("User", back_populates="loans")
 
     def __init__(self, book, user, loan_date, grace_deadline, final_deadline, active=True):
         self.book = book
