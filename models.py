@@ -2,8 +2,6 @@ from sqlalchemy import Column, ForeignKey, Float, DateTime, Integer, String, cre
 from sqlalchemy.orm import declarative_base, sessionmaker, Relationship
 
 db = create_engine('sqlite:///data.db')
-Session = sessionmaker(bind=db)
-session = Session()
 
 base = declarative_base()
 
@@ -29,16 +27,20 @@ class User(base):
     __tablename__ = 'users'
 
     id = Column("id", Integer, primary_key=True, autoincrement=True)
-    name = Column("Name", String)
+    name = Column("Name", String, nullable=False)
+    password = Column("password", String, nullable=False)
     email = Column("email", String, nullable=False, unique=True)
-    phone = Column("phone", String, nullable=False)
+    phone = Column("phone", String, nullable=False, unique=True)
     id_card = Column("id_card", String, nullable=False, unique=True)
+    active = Column("active", Boolean)
 
-    def __init__(self, name, email, phone, id_card):
+    def __init__(self, name, password, email, phone, id_card):
         self.name = name
         self.email = email
         self.phone = phone
         self.id_card = id_card
+        self.password = password
+        self.active = True
 
 
 class Loan(base):
@@ -48,7 +50,7 @@ class Loan(base):
     book_id = Column("book_id", Integer, ForeignKey('books.id'))
     user_id = Column("user_id", Integer, ForeignKey('users.id'))
     loan_date = Column("loan_date", DateTime)
-    grace_deadline = Column("grace_deadline", DateTime)
+    expected_deadline = Column("expected_deadline", DateTime)
     final_deadline = Column("final_deadline", DateTime)
     active = Column("active", Boolean)
 
@@ -79,4 +81,4 @@ class Fine(base):
         self.active = active
 
 
-base.metadata.create_all(bind=db)
+

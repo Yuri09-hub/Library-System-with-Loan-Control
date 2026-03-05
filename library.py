@@ -107,9 +107,9 @@ class Library:
         return f"Fines paid"
 
     @staticmethod
-    def search_book(name: str, writer: str, Category: str, choice: int, session):
+    def search_book(choice: int, session, Answer:str):
         if choice == 1:
-            books = session.query(Book).filter(Book.name == name).all()
+            books = session.query(Book).filter(Book.name == Answer).all()
             if not books:
                 print("Book not found")
             for book in books:
@@ -119,7 +119,7 @@ class Library:
             print("-" * 100)
 
         elif choice == 2:
-            books = session.query(Book).filter(Book.writer == writer).all()
+            books = session.query(Book).filter(Book.writer == Answer).all()
             if not books:
                 print("Book not found")
             for book in books:
@@ -129,7 +129,7 @@ class Library:
             print("-" * 100)
 
         elif choice == 3:
-            books = session.query(Book).filter(Book.Category == Category).all()
+            books = session.query(Book).filter(Book.Category == Answer).all()
             if not books:
                 print("Book not found")
             for book in books:
@@ -161,8 +161,7 @@ class Library:
                       f"{user.name:<20}"
                       f"{user.email:<25}"
                       f"{user.phone:<15}"
-                      f"{user.id_card:<20}"
-                      f"{user.loan_history:<10}")
+                      f"{user.id_card:<20}")
                 print("-" * 120)
         except IntegrityError as e:
             print(f" fun. view_users - Error: {e}")
@@ -178,4 +177,3 @@ class Library:
                   f"{str(loan.grace_deadline):<20}"
                   f"{str(loan.final_deadline):<20}"
                   f"{str(loan.active):<10}")
-

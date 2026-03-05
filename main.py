@@ -1,12 +1,19 @@
-from library import Library
-from models import session
-from sqlalchemy.exc import IntegrityError
+from fastapi import FastAPI
+from passlib.context import CryptContext
+from user_route import user_router
+from loan_route import loan_router
+from book_routes import book_router
+from dotenv import load_dotenv
+import os
 
-try:
-    app = Library()
-    app.register_user(name="Yuri", email="yuri@gmail.com", phone="934576680", id_card="00888LA039", session=session)
-    session.commit()
-except IntegrityError as e:
-    print(e)
-finally:
-    session.close()
+load_dotenv()
+
+SECRET_KEY = os.getenv("SECRET_KEY")
+
+app = FastAPI()
+
+app.include_router(user_router)
+app.include_router(loan_router)
+app.include_router(book_router)
+
+bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
