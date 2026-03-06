@@ -9,11 +9,6 @@ from data_verification import email_validation, number_validation
 user_router = APIRouter(prefix="/user", tags=["user"])
 
 
-@user_router.get("/User")
-async def User():
-    return {"User route created"}
-
-
 @user_router.post("/User/Create")
 async def Create_user(user_schema: Userschemas, session: Session = Depends(get_session)):
     user = session.query(User).filter(User.email == user_schema.email).first()
@@ -26,14 +21,14 @@ async def Create_user(user_schema: Userschemas, session: Session = Depends(get_s
         raise HTTPException(status_code=400, detail="Phone number is not valid")
 
     encrypted_password = bcrypt_context.hash(user_schema.password)
-    new_user = User(name=user_schema.name.title(), email=user_schema.email, passwor=encrypted_password,
-                    phone=user_schema.phone)
+    new_user = User(name=user_schema.name.title(), email=user_schema.email, password=encrypted_password,
+                    phone=user_schema.phone, id_card=user_schema.id_card)
     session.add(new_user)
-    session.commit()
+    session.flush()
 
     user = session.query(User).filter(User.id == 1).first()
     if user:
         user.admin = True
-        session.commit()
 
-    return {"User created"}
+    session.commit()
+    return {"Account created successfully."}

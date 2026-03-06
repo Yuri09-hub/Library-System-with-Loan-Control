@@ -13,14 +13,39 @@ class Book(base):
     writer = Column("writer", String, nullable=False)
     category = Column("category", String, nullable=False)
     isbn = Column("isbn", String, nullable=False, unique=True)
-    stock = Column("stock", Integer, nullable=False)
 
-    def __init__(self, name, writer, category, isbn, stock):
+    def __init__(self, name, writer, category, isbn):
         self.name = name
         self.writer = writer
         self.category = category
         self.isbn = isbn
-        self.stock = stock
+
+
+class book_entry(base):
+    __tablename__ = 'book_entry'
+    id = Column("id", Integer, primary_key=True, autoincrement=True)
+    book = Column("book", String, nullable=False)
+    book_id = Column("book_id", ForeignKey("books.id"), nullable=False)
+    date = Column("date", DateTime, nullable=False)
+
+    def __init__(self, book, book_id, date):
+        self.book = book
+        self.book_id = book_id
+        self.date = date
+
+
+class book_output(base):
+    __tablename__ = "book_output"
+
+    id = Column("id", Integer, primary_key=True, autoincrement=True)
+    book = Column("book", String, nullable=False)
+    book_id = Column("book_id", ForeignKey("books.id"), nullable=False)
+    date = Column("date", DateTime, nullable=False)
+
+    def __init__(self, book, book_id, date):
+        self.book = book
+        self.book_id = book_id
+        self.date = date
 
 
 class User(base):
@@ -33,7 +58,7 @@ class User(base):
     phone = Column("phone", String, nullable=False, unique=True)
     id_card = Column("id_card", String, nullable=False, unique=True)
     active = Column("active", Boolean)
-    admin = Column("admin")
+    admin = Column("admin", Boolean, nullable=False)
 
     def __init__(self, name, password, email, phone, id_card):
         self.name = name
@@ -42,12 +67,14 @@ class User(base):
         self.id_card = id_card
         self.password = password
         self.active = True
+        self.admin = False
 
 
 class Loan(base):
     __tablename__ = 'loans'
 
     id = Column("id", Integer, primary_key=True, autoincrement=True)
+    book = Column("name", String, nullable=False)
     book_id = Column("book_id", Integer, ForeignKey('books.id'))
     user_id = Column("user_id", Integer, ForeignKey('users.id'))
     loan_date = Column("loan_date", DateTime)
@@ -55,13 +82,13 @@ class Loan(base):
     final_deadline = Column("final_deadline", DateTime)
     active = Column("active", Boolean)
 
-    def __init__(self, book, user, loan_date, grace_deadline, final_deadline, active=True):
+    def __init__(self, book, user, loan_date, grace_deadline, final_deadline):
         self.book = book
         self.user = user
         self.loan_date = loan_date
         self.grace_deadline = grace_deadline
         self.final_deadline = final_deadline
-        self.active = active
+        self.active = True
 
 
 class Fine(base):
@@ -74,12 +101,9 @@ class Fine(base):
     fine = Column("fine", Float)
     active = Column("active", Boolean)
 
-    def __init__(self, book, user, date, fine=0.0, active=True):
+    def __init__(self, book, user, date, fine=0.0):
         self.book = book
         self.user = user
         self.date = date
         self.fine = fine
-        self.active = active
-
-
-
+        self.active = True
