@@ -7,7 +7,7 @@ class Userschemas(BaseModel):
     email: str
     password: str
     phone: str
-    id_card: int
+    id_card: str
 
     class Config:
         from_attribute = True

@@ -1,5 +1,5 @@
 from sqlalchemy import Column, ForeignKey, Float, DateTime, Integer, String, create_engine, Boolean
-from sqlalchemy.orm import declarative_base, sessionmaker, Relationship
+from sqlalchemy.orm import declarative_base
 
 db = create_engine('sqlite:///data.db')
 
@@ -11,14 +11,14 @@ class Book(base):
     id = Column("id", Integer, primary_key=True, autoincrement=True)
     name = Column("name", String, nullable=False)
     writer = Column("writer", String, nullable=False)
-    Category = Column("Category", String, nullable=False)
+    category = Column("category", String, nullable=False)
     isbn = Column("isbn", String, nullable=False, unique=True)
     stock = Column("stock", Integer, nullable=False)
 
-    def __init__(self, name, writer, Category, isbn, stock):
+    def __init__(self, name, writer, category, isbn, stock):
         self.name = name
         self.writer = writer
-        self.Category = Category
+        self.category = category
         self.isbn = isbn
         self.stock = stock
 
@@ -27,12 +27,13 @@ class User(base):
     __tablename__ = 'users'
 
     id = Column("id", Integer, primary_key=True, autoincrement=True)
-    name = Column("Name", String, nullable=False)
+    name = Column("name", String, nullable=False)
     password = Column("password", String, nullable=False)
     email = Column("email", String, nullable=False, unique=True)
     phone = Column("phone", String, nullable=False, unique=True)
     id_card = Column("id_card", String, nullable=False, unique=True)
     active = Column("active", Boolean)
+    admin = Column("admin")
 
     def __init__(self, name, password, email, phone, id_card):
         self.name = name
