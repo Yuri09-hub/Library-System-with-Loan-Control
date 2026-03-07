@@ -18,7 +18,7 @@ class Bookschemas(BaseModel):
     writer: str
     category: str
     isbn: str
-    amount: int
+
 
     class Config:
         from_attribute = True

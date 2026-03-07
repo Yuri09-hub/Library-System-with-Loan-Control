@@ -134,20 +134,19 @@ def pay_fine(id_loan: int, session: Session = Depends(get_session),
     return {"message": "Fine paid"}
 
 
-@loan_router.get("/view_list_of_loan")
+@loan_router.get("/view_my_loans")
 async def view_loan(user: User = Depends(verify_token), session: Session = Depends(get_session)):
-    if not user.admin:
-        raise HTTPException(status_code=401, detail="You do not have permission to make this change.")
-
-    loan = session.query(Loan).all()
+    loan = session.query(Loan).filter(Loan.user_id == user.id).all()
+    if not loan:
+        raise HTTPException(status_code=404, detail="Loan not found")
     return {"Loan": loan}
 
 
-@loan_router.get("/view_list_of_fine")
+@loan_router.get("/view_my_fines")
 async def view_loan(user: User = Depends(verify_token), session: Session = Depends(get_session)):
-    if not user.admin:
-        raise HTTPException(status_code=401, detail="You do not have permission to make this change.")
-
-    fine = session.query(Fine).all()
+    fine = session.query(Fine).filter(Fine.user_id == user.id,
+                                      Fine.active == True).all()
+    if not fine:
+        raise HTTPException(status_code=404, detail="Fine not found")
 
     return {"Fine": fine}
