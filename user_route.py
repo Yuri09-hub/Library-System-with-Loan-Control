@@ -1,16 +1,36 @@
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from main import bcrypt_context
+from main import becrypt_context, SECRET_KEY, ACCESS_TOKEN_EXPIRE_MINUTE, ALGORITHM
 from models import User
-from dependecies import get_session
-from schemas import Userschemas
+from dependecies import get_session, verify_token
+from schemas import Userschemas, LoginSchema
 from data_verification import email_validation, number_validation
+from datetime import datetime, timedelta, timezone
+from jose import jwt
 
 user_router = APIRouter(prefix="/user", tags=["user"])
 
 
-@user_router.post("/User/Create")
-async def Create_user(user_schema: Userschemas, session: Session = Depends(get_session)):
+def creat_token(id: int, duration_token=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTE)):
+    expiration_date = datetime.now(timezone.utc) + duration_token
+    dict_info = {"sub": str(id), "exp": expiration_date.timestamp()}
+    jwt_token = jwt.encode(dict_info, SECRET_KEY, ALGORITHM)
+    return jwt_token
+
+
+def authenticate_user(email, password, session: Session = Depends(get_session)):
+    user = session.query(User).filter(User.email == email).first()
+    if not user:
+        return False
+    elif not becrypt_context.verify(password, user.password):
+        return False
+    else:
+        return user
+
+
+@user_router.post("/Create")
+async def Create_Account(user_schema: Userschemas, session: Session = Depends(get_session)):
     user = session.query(User).filter(User.email == user_schema.email).first()
     if user:
         raise HTTPException(status_code=400, detail="User already exists")
@@ -20,7 +40,7 @@ async def Create_user(user_schema: Userschemas, session: Session = Depends(get_s
     elif number_validation(user_schema.phone):
         raise HTTPException(status_code=400, detail="Phone number is not valid")
 
-    encrypted_password = bcrypt_context.hash(user_schema.password)
+    encrypted_password = becrypt_context.hash(user_schema.password)
     new_user = User(name=user_schema.name.title(), email=user_schema.email, password=encrypted_password,
                     phone=user_schema.phone, id_card=user_schema.id_card)
     session.add(new_user)
@@ -32,3 +52,41 @@ async def Create_user(user_schema: Userschemas, session: Session = Depends(get_s
 
     session.commit()
     return {"Account created successfully."}
+
+
+@user_router.post("/Login")
+async def Login(login: LoginSchema, session: Session = Depends(get_session)):
+    user = authenticate_user(login.email, login.password, session)
+
+    if not user:
+        raise HTTPException(status_code=400, detail="User does not exist or invalid credentials")
+    else:
+        access_token = creat_token(user.id)
+        refresh_token = creat_token(user.id, duration_token=timedelta(days=10))
+        return {
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+            "token_type": "Bearer",
+        }
+
+
+@user_router.post("/login-form")
+async def login_form(form_data: OAuth2PasswordRequestForm = Depends(), session: Session = Depends(get_session)):
+    user = authenticate_user(form_data.username, form_data.password, session)
+    if not user:
+        raise HTTPException(status_code=400, detail="User does not exist or invalid credentials")
+    else:
+        access_token = creat_token(user.id)
+        return {
+            "access_token": access_token,
+            "token_type": "Bearer",
+        }
+
+
+@user_router.get("/refresh_token")
+async def refresh_token(user: User = Depends(verify_token)):
+    access_token = creat_token(user.id)
+    return {
+        "access_token": access_token,
+        "type": "Bearer",
+    }

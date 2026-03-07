@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from typing import Optional
 
 
 class Userschemas(BaseModel):
@@ -11,9 +10,6 @@ class Userschemas(BaseModel):
     amount: int
 
     class Config:
-        orm_mode = True
-
-    class Config:
         from_attribute = True
 
 
@@ -22,7 +18,24 @@ class Bookschemas(BaseModel):
     writer: str
     category: str
     isbn: str
+    amount: int
 
     class Config:
         from_attribute = True
 
+
+class LoginSchema(BaseModel):
+    email: str
+    password: str
+
+    class Config:
+        from_attribute = True
+
+
+class LoanSchema(BaseModel):
+    book_id: int
+    user_id: int
+    days: int
+
+    class Config:
+        from_attribute = True
