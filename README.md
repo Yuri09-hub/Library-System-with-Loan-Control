@@ -72,6 +72,5 @@ http://127.0.0.1:8000/docs
 
 ## Author
 
-Yuri Rodrigues  
-Computer Information Technology Student  
+Yuri Rodrigues    
 Angola
