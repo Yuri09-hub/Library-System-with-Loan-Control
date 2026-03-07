@@ -47,7 +47,7 @@ def register_loan(loan_schema: LoanSchema, session: Session = Depends(get_sessio
         raise HTTPException(status_code=404, detail="Book not found")
     elif verify_fine(find_user.id, session):
         raise HTTPException(status_code=400, detail="You need to pay your current fine if want a new loan.")
-    elif verify_loan(find_user.id, session) >= 3:
+    elif verify_loan(find_user.id, session) == 3:
         raise HTTPException(status_code=400, detail="too many Loans")
     elif not entry:
         raise HTTPException(status_code=400, detail="Book out of stock")

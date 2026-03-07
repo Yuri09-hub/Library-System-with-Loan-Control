@@ -82,3 +82,4 @@ async def delete(book_id: int, user: User = Depends(verify_token), session: Sess
     session.commit()
 
     return {"message": "Book deleted successfully"}
+
