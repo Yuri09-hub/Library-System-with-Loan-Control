@@ -143,7 +143,7 @@ async def view_loan(user: User = Depends(verify_token), session: Session = Depen
 
 
 @loan_router.get("/view_my_fines")
-async def view_loan(user: User = Depends(verify_token), session: Session = Depends(get_session)):
+async def view_fine(user: User = Depends(verify_token), session: Session = Depends(get_session)):
     fine = session.query(Fine).filter(Fine.user_id == user.id,
                                       Fine.active == True).all()
     if not fine:

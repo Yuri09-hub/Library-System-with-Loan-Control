@@ -12,7 +12,7 @@ from jose import jwt
 user_router = APIRouter(prefix="/user", tags=["user"])
 
 
-def creat_token(id: int, duration_token=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTE)):
+def create_token(id: int, duration_token=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTE)):
     expiration_date = datetime.now(timezone.utc) + duration_token
     dict_info = {"sub": str(id), "exp": expiration_date.timestamp()}
     jwt_token = jwt.encode(dict_info, SECRET_KEY, ALGORITHM)
@@ -61,8 +61,8 @@ async def Login(login: LoginSchema, session: Session = Depends(get_session)):
     if not user:
         raise HTTPException(status_code=400, detail="User does not exist or invalid credentials")
     else:
-        access_token = creat_token(user.id)
-        refresh_token = creat_token(user.id, duration_token=timedelta(days=10))
+        access_token = create_token(user.id)
+        refresh_token = create_token(user.id, duration_token=timedelta(days=10))
         return {
             "access_token": access_token,
             "refresh_token": refresh_token,
@@ -76,7 +76,7 @@ async def login_form(form_data: OAuth2PasswordRequestForm = Depends(), session: 
     if not user:
         raise HTTPException(status_code=400, detail="User does not exist or invalid credentials")
     else:
-        access_token = creat_token(user.id)
+        access_token = create_token(user.id)
         return {
             "access_token": access_token,
             "token_type": "Bearer",
@@ -85,7 +85,7 @@ async def login_form(form_data: OAuth2PasswordRequestForm = Depends(), session: 
 
 @user_router.get("/Refresh_token")
 async def refresh_token(user: User = Depends(verify_token)):
-    access_token = creat_token(user.id)
+    access_token = create_token(user.id)
     return {
         "access_token": access_token,
         "type": "Bearer",
@@ -121,4 +121,4 @@ def remove_admin(user_id: int, session: Session = Depends(get_session), user: Us
     find_user.admin = False
     return {"message": "Admin privileges removed successfully",
             "user": find_user.id
-    }
+            }

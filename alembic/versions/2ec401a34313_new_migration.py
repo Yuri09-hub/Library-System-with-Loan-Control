@@ -1,8 +1,8 @@
 """New Migration
 
-Revision ID: a3ee152ad490
+Revision ID: 2ec401a34313
 Revises: 
-Create Date: 2026-03-06 23:23:48.758041
+Create Date: 2026-03-07 21:55:28.634740
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'a3ee152ad490'
+revision: str = '2ec401a34313'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -48,6 +48,7 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('book', sa.String(), nullable=False),
     sa.Column('book_id', sa.Integer(), nullable=False),
+    sa.Column('amount', sa.Integer(), nullable=False),
     sa.Column('date', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['book_id'], ['books.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -56,6 +57,7 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('book', sa.String(), nullable=False),
     sa.Column('book_id', sa.Integer(), nullable=False),
+    sa.Column('amount', sa.Integer(), nullable=False),
     sa.Column('date', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['book_id'], ['books.id'], ),
     sa.PrimaryKeyConstraint('id')

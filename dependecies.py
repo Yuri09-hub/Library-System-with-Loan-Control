@@ -16,7 +16,7 @@ def get_session():
 
 def verify_token(token: str = Depends(oauth_scheme), session: Session = Depends(get_session)):
     try:
-        dict_info = jwt.decode(token,SECRET_KEY,ALGORITHM)
+        dict_info = jwt.decode(token, SECRET_KEY, ALGORITHM)
         user_id = int(dict_info["sub"])
     except JWTError as error:
         print(error)
@@ -26,4 +26,3 @@ def verify_token(token: str = Depends(oauth_scheme), session: Session = Depends(
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
-
