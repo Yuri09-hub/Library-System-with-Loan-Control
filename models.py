@@ -26,6 +26,7 @@ class book_entry(base):
     id = Column("id", Integer, primary_key=True, autoincrement=True)
     book = Column("book", String, nullable=False)
     book_id = Column("book_id", ForeignKey("books.id"), nullable=False)
+    amount = Column("amount",Integer, nullable=False)
     date = Column("date", DateTime, nullable=False)
 
     def __init__(self, book, book_id, date):
@@ -40,6 +41,7 @@ class book_output(base):
     id = Column("id", Integer, primary_key=True, autoincrement=True)
     book = Column("book", String, nullable=False)
     book_id = Column("book_id", ForeignKey("books.id"), nullable=False)
+    amount = Column("amount", Integer, nullable=False)
     date = Column("date", DateTime, nullable=False)
 
     def __init__(self, book, book_id, date):
@@ -82,9 +84,10 @@ class Loan(base):
     final_deadline = Column("final_deadline", DateTime)
     active = Column("active", Boolean)
 
-    def __init__(self, book, user, loan_date, grace_deadline, final_deadline):
+    def __init__(self, book, book_id, user_id, loan_date, grace_deadline, final_deadline):
         self.book = book
-        self.user = user
+        self.book_id = book_id
+        self.user_id = user_id
         self.loan_date = loan_date
         self.grace_deadline = grace_deadline
         self.final_deadline = final_deadline
@@ -95,15 +98,15 @@ class Fine(base):
     __tablename__ = 'fines'
 
     id = Column("id", Integer, primary_key=True, autoincrement=True)
-    book = Column("book_id", Integer, ForeignKey('books.id'))
-    user = Column("user", Integer, ForeignKey('users.id'))
+    book_id = Column("book_id", Integer, ForeignKey('books.id'))
+    user_id = Column("user", Integer, ForeignKey('users.id'))
     date = Column("date", DateTime)
     fine = Column("fine", Float)
     active = Column("active", Boolean)
 
-    def __init__(self, book, user, date, fine=0.0):
-        self.book = book
-        self.user = user
+    def __init__(self, book_id, user_id, date, fine=0.0):
+        self.book = book_id
+        self.user_id = user_id
         self.date = date
         self.fine = fine
         self.active = True
