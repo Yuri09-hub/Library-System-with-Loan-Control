@@ -29,9 +29,10 @@ class book_entry(base):
     amount = Column("amount",Integer, nullable=False)
     date = Column("date", DateTime, nullable=False)
 
-    def __init__(self, book, book_id, date):
+    def __init__(self, book, book_id, amount,date):
         self.book = book
         self.book_id = book_id
+        self.amount = amount
         self.date = date
 
 

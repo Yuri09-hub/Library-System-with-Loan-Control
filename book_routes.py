@@ -12,6 +12,7 @@ book_router = APIRouter(prefix="/book", tags=["book"])
 @book_router.post("/Add_book")
 def add_book(book_schemas: Bookschemas, session: Session = Depends(get_session)):
     verify_book = session.query(Book).filter(Book.isbn == book_schemas.isbn).first()
+
     if verify_book:
         raise HTTPException(status_code=400, detail="Book already exists")
 
