@@ -33,7 +33,6 @@ class LoginSchema(BaseModel):
 
 class LoanSchema(BaseModel):
     book_id: int
-    user_id: int
     days: int
 
     class Config:

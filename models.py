@@ -26,10 +26,10 @@ class book_entry(base):
     id = Column("id", Integer, primary_key=True, autoincrement=True)
     book = Column("book", String, nullable=False)
     book_id = Column("book_id", ForeignKey("books.id"), nullable=False)
-    amount = Column("amount",Integer, nullable=False)
+    amount = Column("amount", Integer, nullable=False)
     date = Column("date", DateTime, nullable=False)
 
-    def __init__(self, book, book_id, amount,date):
+    def __init__(self, book, book_id, amount, date):
         self.book = book
         self.book_id = book_id
         self.amount = amount
@@ -45,10 +45,11 @@ class book_output(base):
     amount = Column("amount", Integer, nullable=False)
     date = Column("date", DateTime, nullable=False)
 
-    def __init__(self, book, book_id, date):
+    def __init__(self, book, book_id, date,amount):
         self.book = book
         self.book_id = book_id
         self.date = date
+        self.amount = amount
 
 
 class User(base):
@@ -90,7 +91,7 @@ class Loan(base):
         self.book_id = book_id
         self.user_id = user_id
         self.loan_date = loan_date
-        self.grace_deadline = grace_deadline
+        self.expected_deadline = grace_deadline
         self.final_deadline = final_deadline
         self.active = True
 

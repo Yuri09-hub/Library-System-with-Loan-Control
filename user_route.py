@@ -122,4 +122,3 @@ def remove_admin(user_id: int, session: Session = Depends(get_session), user: Us
     return {"message": "Admin privileges removed successfully",
             "user": find_user.id
             }
-

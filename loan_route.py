@@ -9,7 +9,8 @@ loan_router = APIRouter(prefix="/loan", tags=["loan"])
 
 
 def verify_loan(user: int, session: Session = Depends(get_session)):
-    find_user = session.query(Loan).filter(User.id == user).all()
+    find_user = session.query(Loan).filter(Loan.user_id == user,
+                                           Loan.active == True).all()
     if not find_user:
         return 0
     loan = 0
@@ -32,22 +33,17 @@ def verify_fine(user: int, session: Session = Depends(get_session)):
 def register_loan(loan_schema: LoanSchema, session: Session = Depends(get_session),
                   user: User = Depends(verify_token)):
     find_book = session.query(Book).filter(Book.id == loan_schema.book_id).first()
-    find_user = session.query(User).filter(User.id == loan_schema.user_id).first()
     entry = session.query(book_entry).filter(book_entry.book_id == find_book.id).all()
     out = session.query(book_output).filter(book_output.book_id == find_book.id).all()
 
     value_entry = 0
     value_out = 0
 
-    if not find_user:
-        raise HTTPException(status_code=404, detail="User not found")
-    elif user.id != find_user.id:
-        raise HTTPException(status_code=401, detail="You do not have permission to make this change.")
-    elif not find_book:
+    if not find_book:
         raise HTTPException(status_code=404, detail="Book not found")
-    elif verify_fine(find_user.id, session):
+    elif verify_fine(user.id, session):
         raise HTTPException(status_code=400, detail="You need to pay your current fine if want a new loan.")
-    elif verify_loan(find_user.id, session) == 3:
+    elif verify_loan(user.id, session) == 3:
         raise HTTPException(status_code=400, detail="too many Loans")
     elif not entry:
         raise HTTPException(status_code=400, detail="Book out of stock")
@@ -62,13 +58,17 @@ def register_loan(loan_schema: LoanSchema, session: Session = Depends(get_sessio
     today = datetime.now(timezone.utc)
     deadline = today + timedelta(days=loan_schema.days)
     final_deadline = deadline + timedelta(days=2)
-    new_loan = Loan(book_id=find_book.id, book=find_book.name, user_id=find_user.user, grace_deadline=deadline,
+    new_loan = Loan(book_id=find_book.id, book=find_book.name, user_id=user.id, grace_deadline=deadline,
                     final_deadline=final_deadline, loan_date=today)
-
     session.add(new_loan)
+    session.flush()
+
+    new_out = book_output(book=find_book.name, book_id=find_book.id, date=today,amount=1)
+    session.add(new_out)
+
     session.commit()
     return {"message": "Loan added successfully",
-            "user": find_user.id,
+            "user": user.id,
             "deadline": deadline,
             "final_deadline": final_deadline,
             }
@@ -77,9 +77,7 @@ def register_loan(loan_schema: LoanSchema, session: Session = Depends(get_sessio
 @loan_router.post("/return_book")
 def return_book(loan_id: int, session: Session = Depends(get_session),
                 user: User = Depends(verify_token)):
-    find_loan = session.query(Loan).filter(Loan.user_id == loan_id).first()
-    find_book = session.query(Book).filter(Book.id == find_loan.book_id).first()
-
+    find_loan = session.query(Loan).filter(Loan.id == loan_id).first()
     msg = ""
     if not find_loan:
         raise HTTPException(status_code=404, detail="Loan not found")
@@ -88,10 +86,15 @@ def return_book(loan_id: int, session: Session = Depends(get_session),
     elif not find_loan.active:
         raise HTTPException(status_code=400, detail="Loan already solved")
 
+    find_book = session.query(Book).filter(Book.id == find_loan.book_id).first()
+    if not find_book:
+        raise HTTPException(status_code=404, detail="book not found")
+
+    find_loan.active = False
+
     fine = 0.0
-    today = datetime.now(timezone.utc)
+    today = datetime.now(timezone.utc) if find_loan.final_deadline.tzinfo else datetime.now()
     if find_loan.final_deadline < today:
-        today = datetime.now(timezone.utc)
         day = find_loan.final_deadline - today
         fine += 2.0 * day.days
         new_fine = Fine(book_id=find_loan.book_id, user_id=find_loan.user_id, date=today, fine=fine)
@@ -136,16 +139,11 @@ def pay_fine(id_loan: int, session: Session = Depends(get_session),
 
 @loan_router.get("/view_my_loans")
 async def view_loan(user: User = Depends(verify_token), session: Session = Depends(get_session)):
-    loan = session.query(Loan).filter(Loan.user_id == user.id).limit(10).offset(10)
-    if not loan:
-        raise HTTPException(status_code=404, detail="Loan not found")
+    loan = session.query(Loan).filter(Loan.user_id == user.id).limit(10).offset(0).all()
     return {"Loan": loan}
 
 
 @loan_router.get("/view_my_fines")
 async def view_fine(user: User = Depends(verify_token), session: Session = Depends(get_session)):
-    fine = session.query(Fine).filter(Fine.user_id == user.id).limit(10).offset(10)
-    if not fine:
-        raise HTTPException(status_code=404, detail="Fine not found")
-
+    fine = session.query(Fine).filter(Fine.user_id == user.id).limit(10).offset(0).all()
     return {"Fine": fine}
