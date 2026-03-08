@@ -12,7 +12,7 @@ ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTE = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTE"))
 
 becrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth_scheme = OAuth2PasswordBearer(tokenUrl="user/login-form")
+oauth_scheme = OAuth2PasswordBearer(tokenUrl="/user/login-form")
 
 app = FastAPI()
 

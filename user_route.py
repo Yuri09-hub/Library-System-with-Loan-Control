@@ -37,7 +37,7 @@ async def Create_Account(user_schema: Userschemas, session: Session = Depends(ge
 
     if not email_validation(user_schema.email):
         raise HTTPException(status_code=400, detail="Email is not valid")
-    elif number_validation(user_schema.phone):
+    elif not number_validation(user_schema.phone):
         raise HTTPException(status_code=400, detail="Phone number is not valid")
 
     encrypted_password = becrypt_context.hash(user_schema.password)
@@ -70,7 +70,7 @@ async def Login(login: LoginSchema, session: Session = Depends(get_session)):
         }
 
 
-@user_router.post("/Login-form")
+@user_router.post("/login-form")
 async def login_form(form_data: OAuth2PasswordRequestForm = Depends(), session: Session = Depends(get_session)):
     user = authenticate_user(form_data.username, form_data.password, session)
     if not user:

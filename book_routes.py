@@ -62,9 +62,9 @@ async def update_book(book_id: int, book_schemas: Bookschemas, user: User = Depe
 
 @book_router.get("/view_list_of_book")
 async def view_book(session: Session = Depends(get_session)):
-    book = session.query(Book).limit(10).offset(10)
+    book = session.query(Book).limit(10).offset(0).all()
 
-    if not not book:
+    if not book:
         raise HTTPException(status_code=404, detail="No books available")
     return {"Book": book}
 
