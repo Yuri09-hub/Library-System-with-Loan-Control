@@ -61,11 +61,20 @@ async def update_book(book_id: int, book_schemas: Bookschemas, user: User = Depe
 
 
 @book_router.get("/view_list_of_book")
-async def view_book(book_id: int, session: Session = Depends(get_session)):
-    book = session.query(Book).filter(Book.id == book_id).all()
+async def view_book(session: Session = Depends(get_session)):
+    book = session.query(Book).limit(10).offset(10)
 
     if not not book:
-        raise HTTPException(status_code=404, detail="Book not found")
+        raise HTTPException(status_code=404, detail="No books available")
+    return {"Book": book}
+
+
+@book_router.get("/search_a_book")
+async def search(id: int, session: Session = Depends(get_session)):
+    book = session.query(Book).filter(Book.id == id).first()
+
+    if not book:
+        raise HTTPException(status_code=404, detail="No books found")
     return {"Book": book}
 
 

@@ -35,7 +35,7 @@ async def Create_Account(user_schema: Userschemas, session: Session = Depends(ge
     if user:
         raise HTTPException(status_code=400, detail="User already exists")
 
-    if email_validation(user_schema.email):
+    if not email_validation(user_schema.email):
         raise HTTPException(status_code=400, detail="Email is not valid")
     elif number_validation(user_schema.phone):
         raise HTTPException(status_code=400, detail="Phone number is not valid")
@@ -122,3 +122,4 @@ def remove_admin(user_id: int, session: Session = Depends(get_session), user: Us
     return {"message": "Admin privileges removed successfully",
             "user": find_user.id
             }
+

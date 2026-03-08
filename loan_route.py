@@ -136,7 +136,7 @@ def pay_fine(id_loan: int, session: Session = Depends(get_session),
 
 @loan_router.get("/view_my_loans")
 async def view_loan(user: User = Depends(verify_token), session: Session = Depends(get_session)):
-    loan = session.query(Loan).filter(Loan.user_id == user.id).all()
+    loan = session.query(Loan).filter(Loan.user_id == user.id).limit(10).offset(10)
     if not loan:
         raise HTTPException(status_code=404, detail="Loan not found")
     return {"Loan": loan}
@@ -144,8 +144,7 @@ async def view_loan(user: User = Depends(verify_token), session: Session = Depen
 
 @loan_router.get("/view_my_fines")
 async def view_fine(user: User = Depends(verify_token), session: Session = Depends(get_session)):
-    fine = session.query(Fine).filter(Fine.user_id == user.id,
-                                      Fine.active == True).all()
+    fine = session.query(Fine).filter(Fine.user_id == user.id).limit(10).offset(10)
     if not fine:
         raise HTTPException(status_code=404, detail="Fine not found")
 

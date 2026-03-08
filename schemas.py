@@ -7,7 +7,6 @@ class Userschemas(BaseModel):
     password: str
     phone: str
     id_card: str
-    amount: int
 
     class Config:
         from_attribute = True
